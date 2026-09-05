@@ -1,0 +1,53 @@
+name: RNA Data Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    name: Scan and summarize RNA data files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Find RNA data files
+        id: find
+        run: |
+          echo "Scanning repository for RNA data files (csv/json/xlsx)..."
+          FOUND=$(find . -type f \( -name "*.csv" -o -name "*.json" -o -name "*.xlsx" \) -not -path "./.git/*" | head -50)
+          if [ -z "$FOUND" ]; then
+            echo "No RNA data files found in the repository yet."
+            echo "found=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found data files:"
+            echo "$FOUND"
+            echo "found=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Summarize CSV data
+        if: steps.find.outputs.found == 'true'
+        run: |
+          python3 - <<'EOF'
+          import csv, glob, json, os
+          summary = []
+          for path in glob.glob("**/*.csv", recursive=True):
+              with open(path) as f:
+                  reader = csv.reader(f)
+                  rows = list(reader)
+                  summary.append({
+                      "file": path,
+                      "columns": len(rows[0]) if rows else 0,
+                      "records": max(len(rows) - 1, 0),
+                  })
+          with open("rna_summary.json", "w") as f:
+              json.dump(summary, f, indent=2)
+          print(json.dumps(summary, indent=2))
+          EOF
+
+      - name: Upload summary artifact
+        if: steps.find.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rna-data-summary
+          path: rna_summary.json

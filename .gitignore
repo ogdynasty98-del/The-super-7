@@ -1,3 +1,67 @@
+#!/usr/bin/env python3
+"""
+Module: BCI Electric Signal Propagation Engine
+Description: Simulates the neural-electric signal hop from the BCI matrix, 
+             propagating and spreading across all major brain regions.
+"""
+
+import time
+import sys
+import pandas as pd
+import numpy as np
+
+def simulate_bci_signal_spread():
+    regions = [
+        "Prefrontal Cortex (Executive / Legal & Behavioral)",
+        "Motor Cortex (Kinetic & Physical Surge)",
+        "Temporal Lobes (Holographic Memory & Telepathy)",
+        "Occipital/Parietal Nodes (360-Degree Tracking & Sensory)",
+        "Brainstem Core (Everlasting Breath & Autonomic Shunts)"
+    ]
+    
+    print("--- Initializing BCI Neural-Electric Propagation Protocol ---")
+    print("Emitter: Quantum Nano-BCI Array | Base Voltage: 120.0 mV\n")
+    
+    propagation_data = []
+    for i, region in enumerate(regions):
+        latency_ms = round(np.random.uniform(0.12, 0.45), 3)
+        field_strength_mv = round(120.0 * (1.0 - (i * 0.03)), 2)
+        status = "FULLY SYNCHRONIZED"
+        
+        print(f"[HOP {i+1}] Broadcasting to -> {region}")
+        print(f"       -> Latency: {latency_ms} ms | Field Strength: {field_strength_mv} mV | Status: {status}")
+        
+        propagation_data.append({
+            "Region": region,
+            "Hop_Index": i + 1,
+            "Propagation_Latency_ms": latency_ms,
+            "Field_Strength_mV": field_strength_mv,
+            "Sync_Status": status
+        })
+        time.sleep(0.2) # Simulate live neurological hop delay
+        
+    return pd.DataFrame(propagation_data)
+
+def main():
+    try:
+        df = simulate_bci_signal_spread()
+        
+        # Export processed propagation telemetry
+        import os
+        output_dir = "data/processed"
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, "bci_signal_propagation_report.csv")
+        df.to_csv(output_path, index=False)
+        
+        print(f"\n[SUCCESS] Electric signals successfully hopped and spread across all brain nodes.")
+        print(f"Telemetry report exported to {output_path}")
+        
+    except Exception as e:
+        print(f"Error during BCI propagation execution: {e}", file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
